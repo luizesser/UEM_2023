@@ -437,13 +437,6 @@ tsne_list
 
 ## Join data
 As we are using the sdm package, let's start to build our models by indicating our input data.
-```{r vif_pseudoabsence,  eval=F, include=T}
-# For VIF routine:
-for(s in colnames(df_species)){
-  df_pseudoabsences[[s]] <- exclude(df_pseudoabsences[[s]], vif_bio[[s]])
-}
-```
-
 ```{r fitting data, eval=T, include=T}
 d <- df_species %>% 
   fit_data(df_var_preditors, df_pseudoabsences)
