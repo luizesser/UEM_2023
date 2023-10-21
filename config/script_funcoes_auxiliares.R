@@ -694,8 +694,8 @@ predictions_means <- function(predictions_sp, scenarios){
   l <- unlist(predictions_sp, recursive = F)
   result <- l[[1]]
   df <- l %>% as.data.frame()
-  scenarios <- gsub("-",".",scenarios)
-  if('current' %in% colnames(df)){scenarios2 <- c('current',sort(scenarios))} else {scenarios2 <- scenarios}
+  scenarios2 <- gsub("-",".",scenarios)
+  scenarios2 <- sort(scenarios2)
   for(s in scenarios2){
     if(length(sp_names)==1){
       result <- cbind(result, df[,grep(paste0(s,'_freq.consensus'), colnames(df))])

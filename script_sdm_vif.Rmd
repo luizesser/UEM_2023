@@ -269,6 +269,7 @@ spp_names <- c("Colossoma.macropomum")
 
 
 ## Data Cleaning
+
 ```{r data_cleaning,  eval=T, include=T}
 occ_df <- read.csv(spp_data)
 
@@ -340,18 +341,22 @@ To perform a VIF routine, we will use only the environmental data from the occur
 df_vif <- get_df_vif(grid_current, grid_matrix_pa)
 
 # To pre-select variables use the function select:
-# df_vif <- df_vif %>% select("length_km", "bio_1", "bio_2", "bio_3", "bio_4", "bio_12", "bio_13", "bio_14")
+df_vif <- lapply(df_vif, function(x){select(x, "length_km", "bio_1", "bio_2", "bio_3", "bio_4", "bio_12", "bio_13", "bio_14")})
 
 # Or you can delete undesired variables using -c() in select function as well:
-# df_vif <- df_vif %>% select(-c("length_km", "bio_1", "bio_2", "bio_3", "bio_4", "bio_12", "bio_13", "bio_14"))
+# df_vif <- lapply(df_vif, function(x){select(-c(x, "length_km", "bio_1", "bio_2", "bio_3", "bio_4", "bio_12", "bio_13", "bio_14"))})
 
 # Run VIF routine from usdm package:
 vif_bio <- lapply(df_vif, function(x){vifcor(x,th=0.5)})
 vif_bio[[1]]
 
 # We can exclude variables with high VIF:
-grid_current <- sapply(names(df_vif), function(x){select(grid_current, !vif_bio[[x]]@excluded)}, USE.NAMES = T, simplify = F)
-                        
+grid_current <- sapply(names(df_vif), function(x){
+    vif_obj <- vif_bio[[x]]
+    var_names <- vif_obj@variables[!vif_obj@variables %in% vif_obj@excluded]
+    res <- select(grid_current, all_of(c("cell_id",var_names)))
+    return(res)
+  }, USE.NAMES = T, simplify = F)
 ```
 
 ```{r setting up objects, eval=T, include=T}
