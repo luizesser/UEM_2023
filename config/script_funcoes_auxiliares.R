@@ -708,7 +708,7 @@ predictions_means <- function(predictions_sp, scenarios){
     }
   }
   result <- result[,-c(1:ncol(l[[1]]))]
-  names(result) <- sort(c(paste0(scenarios2, '_pa_mean'), paste0(scenarios2, '_pa_sums'), paste0(scenarios2, '_freq_mean')))
+  names(result) <- sort(c(paste0(scenarios2, '_freq_mean'), paste0(scenarios2, '_pa_mean'), paste0(scenarios2, '_pa_sums')))
   return(result)
 }
 

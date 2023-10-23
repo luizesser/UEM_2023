@@ -231,8 +231,8 @@ add_raster <- function(shp, raster_folder=NULL, var_names=NULL, scenario=NULL){
     names(raster_stack) <- var_names
   }
   
-  if(!as.character(crs(raster_stack))==as.character(CRS(crs(shp)))){
-    raster_stack <- projectRaster(raster_stack, crs=CRS(crs(shp)))
+  if(!(st_crs(raster_stack))==(st_crs(shp))){
+    raster_stack <- projectRaster(raster_stack, crs=(crs(shp)))
   }
     
   # 2. Obter bbox do shape
