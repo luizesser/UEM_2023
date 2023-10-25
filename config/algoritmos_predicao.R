@@ -38,7 +38,7 @@ classe_predicao <- setClass("Mahal_m",
                             )
 )
 
-# Passo 2 
+# Mahalanobis distance for Species Distribution Modeling
 .mahal_m_fit <- function(formula, data, ...) {
   prep_data <- .prepare_data(formula, data)
   

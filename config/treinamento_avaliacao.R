@@ -35,9 +35,6 @@ tsne_plot <- function(df, df_bg, sp_names){
 }
 
 fit_data <- function(df_pa, df_var, df_bg){
-  #if(class(df_var)=='list'){
-  #  df_var <- as.data.frame(df_var)
-  #}
   #if(class(df_bg)=='list'){
   #  df_bg <- as.data.frame(df_bg)
   #}
@@ -51,25 +48,51 @@ fit_data <- function(df_pa, df_var, df_bg){
     df_var %<>% lapply(function(x) { x["cell_id"] <- NULL; x })
   }
   
-  fitted_data <- list()
-  for (sp in colnames(df_pa)){
-    df_var2 <- df_var[[sp]] %>% select(colnames(df_bg[[sp]]))
-    
-    predict_data <- sdmData(
-      sp %>% 
-        paste0(collapse = " + ") %>% 
-        paste(".", sep=" ~ ") %>% 
-        as.formula(), 
-      train = df_pa %>% 
-        select(all_of(sp)) %>% 
-        bind_cols(df_var2) %>% 
-        filter(.[sp]==1),
-      bg = df_bg[[sp]] %>% 
-        bind_cols(rep(0,nrow(df_bg[[sp]])) %>% list() %>% set_names(sp))
-    )
-    fitted_data <- fitted_data %>% 
-      append(list(predict_data) %>% set_names(sp))
+  # PCA
+  if(is.data.frame(df_var)){
+    fitted_data <- list()
+    for (sp in colnames(df_pa)){
+      df_var2 <- df_var %>% select(colnames(df_bg[[sp]]))
+      
+      predict_data <- sdmData(
+        sp %>% 
+          paste0(collapse = " + ") %>% 
+          paste(".", sep=" ~ ") %>% 
+          as.formula(), 
+        train = df_pa %>% 
+          select(all_of(sp)) %>% 
+          bind_cols(df_var2) %>% 
+          filter(.[sp]==1),
+        bg = df_bg[[sp]] %>% 
+          bind_cols(rep(0,nrow(df_bg[[sp]])) %>% list() %>% set_names(sp))
+      )
+      fitted_data <- fitted_data %>% 
+        append(list(predict_data) %>% set_names(sp))
+    }
+  } else {
+    #VIF
+    fitted_data <- list()
+    for (sp in colnames(df_pa)){
+      df_var2 <- df_var[[sp]] %>% select(colnames(df_bg[[sp]]))
+      
+      predict_data <- sdmData(
+        sp %>% 
+          paste0(collapse = " + ") %>% 
+          paste(".", sep=" ~ ") %>% 
+          as.formula(), 
+        train = df_pa %>% 
+          select(all_of(sp)) %>% 
+          bind_cols(df_var2) %>% 
+          filter(.[sp]==1),
+        bg = df_bg[[sp]] %>% 
+          bind_cols(rep(0,nrow(df_bg[[sp]])) %>% list() %>% set_names(sp))
+      )
+      fitted_data <- fitted_data %>% 
+        append(list(predict_data) %>% set_names(sp))
+    }
   }
+  
+  
   names(fitted_data) <- colnames(df_pa)
   return(fitted_data)
 }

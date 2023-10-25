@@ -24,7 +24,7 @@ occurrences_to_shapefile <- function(o_file, sp_names, shp){
     sp_names <- sp_occurrences$species %>% unique()
   }
   
-  if (!is.na(sp_names) && !is.null(sp_names) && length(sp_names)>0){
+  if (!any(is.na(sp_names)) && !is.null(sp_names) && length(sp_names)>0){
     sp_occurrences <-  sp_occurrences %>%
       filter(species %in% sp_names)
   }
