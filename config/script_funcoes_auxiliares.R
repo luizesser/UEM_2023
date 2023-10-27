@@ -803,7 +803,7 @@ data_clean <- function(occ, pred=NULL, species=NA, long=NA, lat=NA, terrestrial=
   x <- cc_cen( x, lon = lon, lat = lat, species = species)
   x <- cc_dupl(x, lon = lon, lat = lat, species = species)
   x <- cc_equ( x, lon = lon, lat = lat)
-  #x <- cc_inst(x, lon = lon, lat = lat, species = species)
+  x <- cc_inst(x, lon = lon, lat = lat, species = species)
   x <- cc_val( x, lon = lon, lat = lat)
   if(terrestrial){x <- cc_sea( x, lon = lon, lat = lat)}
   return(x)

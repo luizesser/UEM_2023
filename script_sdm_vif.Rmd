@@ -793,3 +793,16 @@ for (i in 1:length(ensembles_new_area)) {
 ```{r richness_map2, eval=T, include=T}
 ensemble_map(ensembles_new_area$ssp245$freq_mean, grid_new_area, "SSP2-4.5/2090", 'Frequence')
 ```
+
+
+# Validação independente
+```{r}
+indep_test <- read.csv('input_data/spp_data.csv')
+indep_test <- indep_test[sample(nrow(indep_test), 30),]
+
+library(pROC)
+auc(roc(ensembles$current$current_pa_mean, grid_matrix_pa$clssm_mcrp))
+```
+
+
+
