@@ -185,7 +185,7 @@ area_map <- function(shp, title="", crs_subtitle=T, lat="decimalLatitude", long=
 
 
 
-add_raster <- function(shp, raster_folder=NULL, var_names=NULL, scenario=NULL){
+add_raster <- function(shp, raster_folder=NULL, var_names=NULL, scenario=NULL, scale=T){
   if (is.null(raster_folder)){
     stop("Invalid raster folder!")
   }
@@ -259,8 +259,10 @@ add_raster <- function(shp, raster_folder=NULL, var_names=NULL, scenario=NULL){
   
   v <- v %>% mutate(across(everything(), ~replace_na(.x, NA)))
   
-  v2 <- scale(na.omit(v))
-  v[!is.na(v[])] <- v2
+  if(scale){
+    v2 <- scale(na.omit(v))
+    v[!is.na(v[])] <- v2
+  }
   
   # 7. rasteriza shape (dentro do stars)
   shp_raster <- shp %>%

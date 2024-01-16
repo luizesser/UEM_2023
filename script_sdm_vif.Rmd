@@ -198,7 +198,7 @@ We will start with current data.
 ## Error in attempt to apply non-function
 if (output_shp_current %>% file_exists() == F) {
   grid_current <- grid_study_area %>% 
-    add_raster(folder_current_rasters, raster_vars) 
+    add_raster(folder_current_rasters, raster_vars, scale=T) 
     
   output_shp_current %>% 
     path_dir() %>% 
@@ -221,7 +221,7 @@ if (!all(output_shp_future %>% file_exists())) {
   for (i in 1:length(scenarios)) {
 
       grid_future <- grid_study_area %>% 
-       add_raster(folder_future_rasters, future_var_names, scenarios[i]) 
+       add_raster(folder_future_rasters, future_var_names, scenarios[i], scale=T) 
       
       output_shp_future %>% 
        path_dir() %>% 
