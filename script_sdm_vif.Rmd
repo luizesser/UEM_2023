@@ -119,7 +119,7 @@ b) Outputs:
 
 ```{r}
 # Name of shapefile (.shp) for the study area to be saved.
-output_shp_study_area <- here("output_data/grid/Amazon_grid.shp")
+output_shp_study_area <- here("output_data/grid_7km/Amazon_grid.shp")
 
 # Name of R object (.rds) where the current rescaled variables will be saved.
 output_shp_current <- here("output_data/WorldClim_data_current_rescaled/Amazon_current.rds")
@@ -253,7 +253,7 @@ b) Output:
 
 ```{r files output occurrence, eval=T, include=T}
 #  Set the path to the output shapefile, which will contain the presence/absence matrix.
-spp_output <- here("output_data/spp_pa.shp")
+spp_output <- here("output_data/spp_pa_7km.shp")
 ```
 
 
@@ -443,6 +443,7 @@ It is possible to plot a t-SNE graph to check whether pseudoabsence data cluster
 tsne_list <- df_potential_predictors %>% 
   tsne_plot(df_pseudoabsences, spp_names)
 tsne_list
+
 ```
 
 
@@ -797,11 +798,14 @@ ensemble_map(ensembles_new_area$ssp245$freq_mean, grid_new_area, "SSP2-4.5/2090"
 
 # Validação independente
 ```{r}
-indep_test <- read.csv('input_data/spp_data.csv')
-indep_test <- indep_test[sample(nrow(indep_test), 30),]
+indep_test <- paste0(dirname(spp_data), '/spp_data.csv')
+
+occ_indep_shp <- indep_test %>% 
+  occurrences_to_shapefile(spp_names[2], grid_study_area)
+
 
 library(pROC)
-auc(roc(ensembles$current$current_pa_mean, grid_matrix_pa$clssm_mcrp))
+auc(roc(ensembles$current$current_pa_mean, rep(1,nrow(occ_indep_shp$species)))
 ```
 
 

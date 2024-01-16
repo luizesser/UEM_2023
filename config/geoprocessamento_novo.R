@@ -178,10 +178,10 @@ area_map <- function(shp, title="", crs_subtitle=T, lat="decimalLatitude", long=
 }
 
 
-#shp = grid_study_area
-#raster_folder= folder_current_rasters
-#var_names= raster_vars
-#scenario = 'ssp370'
+shp = grid_study_area
+raster_folder= folder_current_rasters
+var_names= raster_vars
+scenario = 'ssp370'
 
 
 
@@ -258,6 +258,9 @@ add_raster <- function(shp, raster_folder=NULL, var_names=NULL, scenario=NULL){
     as.data.frame()
   
   v <- v %>% mutate(across(everything(), ~replace_na(.x, NA)))
+  
+  v2 <- scale(na.omit(v))
+  v[!is.na(v[])] <- v2
   
   # 7. rasteriza shape (dentro do stars)
   shp_raster <- shp %>%

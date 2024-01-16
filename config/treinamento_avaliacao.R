@@ -19,7 +19,7 @@ tsne_plot <- function(df, df_bg, sp_names){
     
     esp_colors <- df_pred %>% 
       unique() %>% 
-      select(all_of(sp)) %>% 
+      select(sp) %>% 
       pull()
     
     tsne_result <- qplot(
@@ -685,12 +685,12 @@ model_failures <- function(fitted_data, models_folder){
 #shp_pa=shp_matrix_pa
 #df_var=df_var_preditors
 #especies=spp_names
-#method="cluster"
+#method="envelope"
 #cluster_m="k-means"
 #n_pa=1
 #output_folder=here("output_data/models")
 #
-#sp=colnames(df_pa)[1]
+#sp=colnames(shp_pa)[1]
 
 pseudoabsences <- function (shp_pa, df_var, especies, method="envelope", cluster_m="kmeans", n_pa=1, output_folder=here("output_data/models")){
   especies <- especies %>% 
@@ -727,7 +727,7 @@ pseudoabsences <- function (shp_pa, df_var, especies, method="envelope", cluster
   }
   
   .get_summary_from <- function(a_df_var, a_list_pa){
-    p <- a_list_pa %>% keep(~ .==1)
+    p <- a_list_pa #%>% keep(~ .==1)
     grupos <- a_df_var %>% 
       bind_cols(especie=a_list_pa) %>%
       group_by(grupo) %>%
@@ -746,14 +746,16 @@ pseudoabsences <- function (shp_pa, df_var, especies, method="envelope", cluster
     backgrounds = list()
     for (sp in names(df_pa)){
       if (!file_exists(paste0(output_folder,'/',sp,'/pseudoabsence_',method,'_',sp,'_',n_pa,'.csv'))){
-        df_p <- df_pa[[sp]] %>% select(sp %>% all_of()) %>% filter(.[sp]==1)
-        print(colnames(df_var))
-        df_var2 <- df_var %>% .add_grupos(df_p, percent_grupos = 10, cluster_m = cluster_m) # k = 10% do numero de pres.
+        df_p <- df_pa %>% select(sp %>% all_of()) %>% filter(.[sp]==1)
+        print(colnames(df_var[[sp]]))
+        print(class(df_p))
+        
+        df_var2 <- df_var[[sp]] %>% .add_grupos(df_p, percent_grupos = 10, cluster_m = cluster_m) # k = 10% do numero de pres.
         print(colnames(df_var2))
-        grupos <- df_var2 %>% .get_summary_from(df_pa[[sp]])
+        grupos <- df_var2 %>% .get_summary_from(df_p)
         
         df_bg <- df_var2 %>%
-          bind_cols(especie=df_pa[[sp]]) %>%
+          bind_cols(especie=df_p) %>%
           filter(especie==0) %>%
           filter(grupo %in% grupos$grupo) %>%
           group_by(grupo) %>% 
@@ -825,19 +827,46 @@ pseudoabsences <- function (shp_pa, df_var, especies, method="envelope", cluster
           }
           print(paste0("Building pseudoabsences for ",sp,"..."))
           
-          sp_dat <- cbind(df_pa[,sp],df_var[[sp]])
-          colnames(sp_dat)[1] <- sp
+          sp_dat <- cbind(df_pa,df_var[[sp]])
           sp_dat <- sp_dat[sp_dat[,sp]==1,]
-
-          d <- sdmData(reformulate(termlabels = colnames(df_var[[sp]]), response = sp),
+          sp_dat <- sp_dat %>% select(sp,all_of(names(df_var[[sp]])))
+          
+          d <- sdmData(reformulate(termlabels = names(df_var[[sp]]), response = sp),
                        train = sp_dat)
-
+          
           m <- sdm(~.,
                    data = d,
                    methods='bioclim')
-
+          
           p <- predict(m, df_var[[sp]],
                        filename=paste0(output_folder,'/',sp,'/bioclim_',sp,'.tif'))
+          
+#          sp_dat <- cbind(df_pa[,sp],df_var[[sp]])
+#          colnames(sp_dat)[1] <- sp
+#          sp_dat <- sp_dat[sp_dat[,sp]==1,]
+#          sp_dat <- na.omit(sp_dat)
+#          
+#          model <- dismo::bioclim(x=select(sp_dat,!sp))
+#          p <- predict(model, df_var[[sp]])
+#          p <- ifelse(p>0,NA,0)
+#          env2 <- as.data.frame(df_var[[sp]])
+#          env2 <- env2[!is.na(p[]),]
+#          
+#          sp_dat <- cbind(df_pa[,sp],df_var[[sp]])
+#          colnames(sp_dat)[1] <- sp
+#          sp_dat <- sp_dat[sp_dat[,sp]==1,]
+#
+#          d <- sdmData(reformulate(termlabels = colnames(df_var[[sp]]), response = sp),
+#                       train = sp_dat)
+#
+#          m <- sdm(~.,
+#                   data = d,
+#                   methods='bioclim')
+#
+#          selectMethod("predict", class(m))
+#          
+#          p <- predict(m, df_var[[sp]],
+#                       filename=paste0(output_folder,'/',sp,'/bioclim_',sp,'.tif'))
         } else {
           p <- raster(paste0(output_folder,'/',sp,'/bioclim_',sp,'.tif'))
         }
