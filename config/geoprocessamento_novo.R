@@ -178,10 +178,10 @@ area_map <- function(shp, title="", crs_subtitle=T, lat="decimalLatitude", long=
 }
 
 
-shp = grid_study_area
-raster_folder= folder_current_rasters
-var_names= raster_vars
-scenario = 'ssp370'
+#shp = grid_study_area
+#raster_folder= folder_current_rasters
+#var_names= raster_vars
+#scenario = 'ssp370'
 
 
 
